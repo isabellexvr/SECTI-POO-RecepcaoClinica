@@ -317,20 +317,23 @@ public class App {
 
             case 2:
                 //cancelar consulta
-                Consulta consultaCancelar = getConsultaByEspecialidade(input, formato, "deletar");
+                Consulta consultaCancelar = getConsultaByEspecialidade(input, formato, "cancelar");
 
                 consultaCancelar.cancelarConsulta();
 
                 System.out.println("\nConsulta cancelada com sucesso.\n");
 
                 //System.out.println("oh papai");
+                consultas.remove(consultaCancelar);
 
                 continuarOuSair(input);
                 break;
             case 3:
                 //confirmar consulta
-                listarConsultas(consultas, formato);
+                Consulta consultaConfirmar = getConsultaByEspecialidade(input, formato, "confirmar");
 
+                consultaConfirmar.confirmarConsulta();
+                System.out.println("\nConsulta confirmada com sucesso.\n");
                 continuarOuSair(input);
                 break;
         }
@@ -525,7 +528,9 @@ public class App {
             System.out.println("\tPaciente: " + paciente.getNome() + "(Cartão do SUS: " + paciente.getCartaoSUS()+ ")");
             System.out.println("\tData: " + formato.format(consulta.getDataConsulta()));
             System.out.println("\tValor da Consulta: " + consulta.getPreco());
+            System.out.println("\tStatus Geral: " + (consulta.getConsultaConfirmada() ? "Consulta Confirmada." : "Consulta ainda não confirmada"));
             System.out.println("\tStatus do Pagamento: " + (consulta.getPagamento() ? "Pagamento Confirmado." : "Ainda não pago."));
+
         }
 
     }

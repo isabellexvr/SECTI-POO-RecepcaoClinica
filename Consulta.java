@@ -5,8 +5,7 @@ public class Consulta {
     Paciente paciente;
     Medico medico;
     Date dataConsulta;
-
-    boolean consultaConfirmada, pagamento;
+    boolean consultaConfirmada, pagamento, status;
     double preco;
 
     Consulta(Especialidade especialidadeConsulta, Paciente paciente, Medico medico, Date dataConsulta){
