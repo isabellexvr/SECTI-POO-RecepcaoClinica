@@ -62,19 +62,7 @@ public class App {
 
                     System.out.println("\n* Nova Consulta:\n");
 
-                    System.out.println("Qual será a especialidade da consulta?");
-                    listarEspecialidades(true);
-                    int especialidadeIndex = input.nextInt();
-                    input.nextLine();
 
-                    while(especialidadeIndex < 0 || especialidadeIndex > especialidades.size() - 1){
-                        System.out.println("Qual será a especialidade da consulta?");
-                        listarEspecialidades(true);
-                        especialidadeIndex = input.nextInt();
-                        input.nextLine();
-                    }
-
-                    Especialidade especialidadeNovaConsulta = especialidades.get(especialidadeIndex);
 
                     Paciente pacienteNovaConsulta = null;
 
@@ -158,7 +146,9 @@ public class App {
                     }
 
 
-                    Consulta novaConsulta = new Consulta(especialidadeNovaConsulta, pacienteNovaConsulta, medicoNovaConsulta, dataConsulta);
+
+
+                    Consulta novaConsulta = new Consulta(medicoNovaConsulta.getEspecialidade(), pacienteNovaConsulta, medicoNovaConsulta, dataConsulta);
                     consultas.add(novaConsulta);
 
                     System.out.println("\nConsulta cadastrada com sucesso.\n");
@@ -249,53 +239,58 @@ public class App {
 
     }
 
+    public static Consulta getConsultaByEspecialidade(Scanner input, SimpleDateFormat formato, String op){
+        System.out.println("De qual especialidade é a consulta?\n(insira o número correspondente à especialidade)");
+        listarEspecialidades(false);
+        int especialidadeIndex = input.nextInt() - 1;
+        input.nextLine();
+
+        while (especialidadeIndex < 0 || especialidadeIndex > especialidades.size() - 1){
+            System.out.println("\nEspecialidade não encontrada. Tente novamente.\n");
+
+            System.out.println("De qual especialidade é a consulta?\n(insira o número correspondente à especialidade)");
+            listarEspecialidades(false);
+            especialidadeIndex = input.nextInt() - 1;
+            input.nextLine();
+        }
+
+        Especialidade esp = especialidades.get(especialidadeIndex);
+
+        //cast de stream pra lista
+        List<Consulta> consultasEsp = consultas.stream()
+                .filter(c -> c.getEspecialidadeConsulta().getNome().equals(esp.getNome()))
+                .toList();
+
+        //cast de lista pra arraylist
+        ArrayList<Consulta> consultasArrayList = new ArrayList<>(consultasEsp);
+
+        System.out.println("\nSelecione a consulta que deseja " + op + ": \n");
+        listarConsultas(consultasArrayList, formato);
+
+        int consultaIndex = input.nextInt() - 1;
+        input.nextLine();
+
+        while(consultaIndex < 0 || consultaIndex > consultasEsp.size() - 1){
+            System.out.println("\nConsulta não encontrada. Tente novamente.\n");
+
+            System.out.println("\nSelecione a consulta que deseja " + op + ": \n");
+            listarConsultas(consultasArrayList, formato);
+
+            consultaIndex = input.nextInt() - 1;
+            input.nextLine();
+        }
+
+        Consulta consulta = consultasEsp.get(consultaIndex);
+        return consulta;
+    }
+
     public static void handleSubmenu2(int escolha, Scanner input, SimpleDateFormat formato){
         switch (escolha){
             case 1:
                 //remarcar consulta
-                System.out.println("De qual especialidade é a consulta?\n(insira o número correspondente à especialidade)");
-                listarEspecialidades(false);
-                int especialidadeIndex = input.nextInt() - 1;
-                input.nextLine();
+                Consulta consultaRemarcar = getConsultaByEspecialidade(input, formato, "reagendar");
 
-                while (especialidadeIndex < 0 || especialidadeIndex > especialidades.size() - 1){
-                    System.out.println("\nEspecialidade não encontrada. Tente novamente.\n");
-
-                    System.out.println("De qual especialidade é a consulta?\n(insira o número correspondente à especialidade)");
-                    listarEspecialidades(false);
-                    especialidadeIndex = input.nextInt() - 1;
-                    input.nextLine();
-                }
-
-                Especialidade esp = especialidades.get(especialidadeIndex);
-
-                //cast de stream pra lista
-                List<Consulta> consultasEsp = consultas.stream()
-                        .filter(c -> c.getEspecialidadeConsulta().getNome().equals(esp.getNome()))
-                        .toList();
-
-                //cast de lista pra arraylist
-                ArrayList<Consulta> consultasArrayList = new ArrayList<>(consultasEsp);
-
-                System.out.println("\nSelecione a consulta que deseja reagendar:\n");
-                listarConsultas(consultasArrayList, formato);
-
-                int consultaIndex = input.nextInt() - 1;
-                input.nextLine();
-
-                while(consultaIndex < 0 || consultaIndex > consultasEsp.size() - 1){
-                    System.out.println("\nConsulta não encontrada. Tente novamente.\n");
-
-                    System.out.println("\nSelecione a consulta que deseja reagendar:\n");
-                    listarConsultas(consultasArrayList, formato);
-
-                    consultaIndex = input.nextInt() - 1;
-                    input.nextLine();
-                }
-
-                Consulta consulta = consultasEsp.get(consultaIndex);
-
-                System.out.println("\nA consulta selecionada está agendada para " + formato.format(consulta.getDataConsulta()) + ". \nDeseja mudar para que dia?");
+                System.out.println("\nA consulta selecionada está agendada para " + formato.format(consultaRemarcar.getDataConsulta()) + ". \nDeseja mudar para que dia?");
 
                 Date dataConsulta = null;
                 boolean formatoValido = false;
@@ -312,9 +307,9 @@ public class App {
                     }
                 }
 
-                consulta.reagendarConsulta(dataConsulta);
+                consultaRemarcar.reagendarConsulta(dataConsulta);
 
-                System.out.println("\nConsulta reagendada para " + formato.format(dataConsulta) + "com sucesso.\n");
+                System.out.println("\nConsulta reagendada para " + formato.format(dataConsulta) + " com sucesso.\n");
 
                 continuarOuSair(input);
 
@@ -322,7 +317,14 @@ public class App {
 
             case 2:
                 //cancelar consulta
-                Especialidade.listarMedicos();
+                Consulta consultaCancelar = getConsultaByEspecialidade(input, formato, "deletar");
+
+                consultaCancelar.cancelarConsulta();
+
+                System.out.println("\nConsulta cancelada com sucesso.\n");
+
+                //System.out.println("oh papai");
+
                 continuarOuSair(input);
                 break;
             case 3:
@@ -536,9 +538,9 @@ public class App {
 
             System.out.println(i + 1 + ". " +especialidade.getNome());
             if(mostrarPreco){
-                System.out.println("\tPreço por Consulta: " + especialidade.getPrecoConsulta());
+                System.out.println("\tPreço por Consulta: R$" + especialidade.getPrecoConsulta());
             }
-            System.out.println("\t");
+            //System.out.println("\t");
         }
     }
 

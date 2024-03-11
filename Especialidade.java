@@ -34,11 +34,12 @@ public class Especialidade {
     }
     public static void listarMedicos(){
         for (int i = 0; i < medicos.size(); i++) {
-            System.out.println("- Nome do Médico: " + medicos.get(i).getNome());
-            System.out.println("\tCRM: " + medicos.get(i).getCRM());
-            System.out.println("\tSalário: " + medicos.get(i).getSalario());
-            System.out.println("\tEspecialidade: "+ medicos.get(i).getEspecialidade().getNome());
-            System.out.println("\tCPF: " + medicos.get(i).getCpf());
+            System.out.println(i + 1 + ". Médico:");
+            System.out.println("\t- Nome do Médico: " + medicos.get(i).getNome());
+            System.out.println("\t- CRM: " + medicos.get(i).getCRM());
+            System.out.println("\t- Salário: " + medicos.get(i).getSalario());
+            System.out.println("\t- Especialidade: "+ medicos.get(i).getEspecialidade().getNome());
+            System.out.println("\t- CPF: " + medicos.get(i).getCpf());
         }
     }
     public static void addMedico(Medico medico){
