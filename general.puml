@@ -1,0 +1,93 @@
+@startuml
+
+class Especialidade {
+    - String nome
+    - double precoConsulta
+    + medicos: ArrayList<Medico>
+    --
+    + Especialidade(nome: String, preco: double)
+    + getPrecoConsulta(): double
+    + getNome(): String
+    + getMedicos(): ArrayList<Medico>
+    + getMedicosSize(): int
+    + getMedicoByIndex(index: int): Medico
+    + listarMedicos(medicos: ArrayList<Medico>): void
+    + getMedicosByEspecialidade(esp: Especialidade): ArrayList<Medico>
+    + addMedico(medico: Medico): boolean
+}
+
+class Paciente {
+    - String cartaoSUS
+    - Especialidade atendimento
+    --
+    + Paciente(nome: String, cpf: String, dataNascimento: Date, cartaoSUS: String, especialidade: Especialidade)
+    + getAtendimento(): Especialidade
+    + getCartaoSUS(): String
+}
+
+abstract class Pessoa {
+    - String nome
+    - String cpf
+    - Date dataNascimento
+    --
+    + Pessoa(nome: String, cpf: String, dataNascimento: Date)
+    + getNome(): String
+    + getCpf(): String
+    + getDataNascimento(): String
+}
+
+class Medico {
+    - String CRM
+    - double salario
+    - Especialidade especialidade
+    --
+    + Medico(nome: String, cpf: String, dataNascimento: Date, salario: double, CRM: String, especialidade: Especialidade)
+    + getCRM(): String
+    + getSalario(): double
+    + getEspecialidade(): Especialidade
+}
+
+class Consulta {
+    - Especialidade especialidadeConsulta
+    - Paciente paciente
+    - Medico medico
+    - Date dataConsulta
+    - boolean consultaConfirmada
+    - boolean pagamento
+    - boolean status
+    - double preco
+    --
+    + Consulta(especialidadeConsulta: Especialidade, paciente: Paciente, medico: Medico, dataConsulta: Date)
+    + getEspecialidadeConsulta(): Especialidade
+    + getMedico(): Medico
+    + getPaciente(): Paciente
+    + getDataConsulta(): Date
+    + getConsultaConfirmada(): boolean
+    + reagendarConsulta(novaData: Date): void
+    + cancelarConsulta(): void
+    + confirmarConsulta(): void
+    + getPreco(): double
+    + getPagamento(): boolean
+    + setPagamento(): void
+}
+
+class App {
+    +exibirMenu(): void
+    +exibirSubmenu(indexMenu: int): void
+    +handleSubmenu1(escolha: int, input: Scanner, consultas: ArrayList<Consulta>, formato: SimpleDateFormat): void
+    +handleSubmenu3(escolha: int, input: Scanner, formato: SimpleDateFormat): void
+    +getConsultaByEspecialidade(input: Scanner, formato: SimpleDateFormat, op: String): Consulta
+    +handleSubmenu2(escolha: int, input: Scanner, formato: SimpleDateFormat): void
+    +calcularIdade(dataNascimentoString: String): int
+    +novaConsulta(esp: Especialidade, pac: Paciente, med: Medico, data: Date): void
+    +listarPacientes(): void
+    +cadastrarMedico(input: Scanner, formato: SimpleDateFormat): void
+    +adicionarNovaEspecialidade(): void
+    +isNumeric(strNum: String): boolean
+    +cadastrarPaciente(input: Scanner, formato: SimpleDateFormat): Paciente
+    +listarConsultas(consultas: ArrayList<Consulta>, formato: SimpleDateFormat): void
+    +listarEspecialidades(mostrarPreco: boolean): void
+    +continuarOuSair(input: Scanner): void
+}
+
+@enduml
