@@ -192,7 +192,7 @@ public class App {
                     int escolhaSub4 = input.nextInt();
                     input.nextLine();
 
-                    while (escolhaSub4 <= 0 || escolhaSub4 > 1){
+                    while (escolhaSub4 != 1){
                         System.out.println("\nOpção inválida. Tente novamente.\n");
 
                         exibirSubmenu(escolha);
@@ -309,7 +309,13 @@ public class App {
         //cast de lista pra arraylist
         ArrayList<Consulta> consultasArrayList = new ArrayList<>(consultasEsp);
 
+        if(consultasArrayList.isEmpty()){
+
+            return null;
+        }
+
         System.out.println("\nSelecione a consulta que deseja " + op + ": \n");
+
         listarConsultas(consultasArrayList, formato);
 
         int consultaIndex = input.nextInt() - 1;
@@ -334,6 +340,12 @@ public class App {
             case 1:
                 //remarcar consulta
                 Consulta consultaRemarcar = getConsultaByEspecialidade(input, formato, "reagendar");
+
+                if(consultaRemarcar == null){
+                    System.out.println("\nNão há consultas para essa especialidade.\n");
+                    continuarOuSair(input);
+                    break;
+                }
 
                 System.out.println("\nA consulta selecionada está agendada para " + formato.format(consultaRemarcar.getDataConsulta()) + ". \nDeseja mudar para que dia?");
 
@@ -364,6 +376,12 @@ public class App {
                 //cancelar consulta
                 Consulta consultaCancelar = getConsultaByEspecialidade(input, formato, "cancelar");
 
+                if(consultaCancelar == null){
+                    System.out.println("\nNão há consultas para essa especialidade.\n");
+                    continuarOuSair(input);
+                    break;
+                }
+
                 consultaCancelar.cancelarConsulta();
 
                 System.out.println("\nConsulta cancelada com sucesso.\n");
@@ -376,6 +394,12 @@ public class App {
             case 3:
                 //confirmar consulta
                 Consulta consultaConfirmar = getConsultaByEspecialidade(input, formato, "confirmar");
+
+                if(consultaConfirmar == null){
+                    System.out.println("\nNão há consultas para essa especialidade.\n");
+                    continuarOuSair(input);
+                    break;
+                }
 
                 consultaConfirmar.confirmarConsulta();
                 System.out.println("\nConsulta confirmada com sucesso.\n");
@@ -471,7 +495,7 @@ public class App {
             System.out.println("\nSelecione uma das opções");
             System.out.println("1. Cancelar cadastro");
             System.out.println("2. Digitar o CPF novamente");
-            System.out.println("3. Utilizar o usuário " + medicoCPFRepetido.get().getNome() );
+           // System.out.println("3. Utilizar o usuário " + medicoCPFRepetido.get().getNome() );
             //System.out.println("1. Sim\n2.Não");
             int cancelarCad = input.nextInt();
             input.nextLine();
@@ -552,7 +576,7 @@ public class App {
         Medico newMed = new Medico(nome, cpf, dataNascimento, salario, CRM, especialidade);
         boolean status = Especialidade.addMedico(newMed);
 
-        if(status){
+        if(!status){
             System.out.println("\nCRM já cadastrado\n");
         }else{
             System.out.println("\n Médico cadastrado com sucesso!\n");
