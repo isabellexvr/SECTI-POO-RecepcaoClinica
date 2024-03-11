@@ -32,17 +32,35 @@ public class Especialidade {
     public static Medico getMedicoByIndex(int index){
         return medicos.get(index);
     }
-    public static void listarMedicos(){
+    public static void listarMedicos(ArrayList<Medico> medicos){
+        if(medicos.isEmpty()){
+            System.out.println("\nAinda não há médicos cadastrados.\n");
+            return;
+        }
         for (int i = 0; i < medicos.size(); i++) {
             System.out.println(i + 1 + ". Médico:");
             System.out.println("\t- Nome do Médico: " + medicos.get(i).getNome());
             System.out.println("\t- CRM: " + medicos.get(i).getCRM());
-            System.out.println("\t- Salário: " + medicos.get(i).getSalario());
+            System.out.println("\t- Salário basal: R$" + medicos.get(i).getSalario());
             System.out.println("\t- Especialidade: "+ medicos.get(i).getEspecialidade().getNome());
+            System.out.println("\t- Salário por Consulta: R$" + medicos.get(i).getEspecialidade().getPrecoConsulta());
             System.out.println("\t- CPF: " + medicos.get(i).getCpf());
         }
     }
-    public static void addMedico(Medico medico){
+
+    public static ArrayList<Medico> getMedicosByEspecialidade(Especialidade esp){
+        ArrayList<Medico> medFiltrados = new ArrayList<>();
+
+        for (int i = 0; i < medicos.size(); i++) {
+            Medico medico = medicos.get(i);
+            if(medico.getEspecialidade().getNome().equals(esp.getNome())){
+                medFiltrados.add(medico);
+            }
+
+        }
+        return medFiltrados;
+    }
+    public static boolean addMedico(Medico medico){
 
     //    Optional<Medico> x = medicos.stream()
     //            .filter(m -> m.getEspecialidade().getNome().equals(medico.getEspecialidade().getNome()))
@@ -54,9 +72,10 @@ public class Especialidade {
 
 
         if(medicoEncontrado.isPresent()){
-            System.out.println("CRM já cadastrado");
+            return false;
         }else{
             medicos.add(medico);
+            return true;
         }
     }
 }

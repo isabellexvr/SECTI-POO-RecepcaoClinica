@@ -55,14 +55,20 @@ public class App {
                     int submenuOpcao = input.nextInt();
                     input.nextLine();
 
+                    while (submenuOpcao < 1 || submenuOpcao > 4){
+                        System.out.println("\nOpção inválida. Tente novamente.\n");
+
+                        exibirSubmenu(escolha);
+                        submenuOpcao = input.nextInt();
+                        input.nextLine();
+                    }
+
                     handleSubmenu1(submenuOpcao, input, consultas, formato);
                 break;
 
                 case 2:
 
                     System.out.println("\n* Nova Consulta:\n");
-
-
 
                     Paciente pacienteNovaConsulta = null;
 
@@ -113,15 +119,25 @@ public class App {
 
                 Medico medicoNovaConsulta;
 
+                    ArrayList<Medico> medicosFiltrados = new ArrayList<>();
+                    assert pacienteNovaConsulta != null;
+                    medicosFiltrados = Especialidade.getMedicosByEspecialidade(pacienteNovaConsulta.getAtendimento());
+
+                    if(medicosFiltrados.isEmpty()){
+                        System.out.println("\nAinda não há médicos cadastrados para essa especialidade.\n\nCancelando agendamento de consulta...\n");
+                        continuarOuSair(input);
+                        break;
+                    }
+
                     System.out.println("Selecione o médico da consulta:");
-                    Especialidade.listarMedicos();
+                    Especialidade.listarMedicos(medicosFiltrados);
                     int medicoIndex = input.nextInt() - 1;
                     input.nextLine();
 
                     while(medicoIndex < 0 || medicoIndex > Especialidade.getMedicosSize() - 1){
                         System.out.println("\nMédico não encontrado. Tente novamente\n");
                         System.out.println("Selecione o médico da consulta:");
-                        Especialidade.listarMedicos();
+                        Especialidade.listarMedicos(medicosFiltrados);
                         medicoIndex = input.nextInt() - 1;
                         input.nextLine();
                     }
@@ -145,9 +161,6 @@ public class App {
                         }
                     }
 
-
-
-
                     Consulta novaConsulta = new Consulta(medicoNovaConsulta.getEspecialidade(), pacienteNovaConsulta, medicoNovaConsulta, dataConsulta);
                     consultas.add(novaConsulta);
 
@@ -161,7 +174,7 @@ public class App {
                     int escolhaSub = input.nextInt();
                     input.nextLine();
 
-                    while (escolhaSub < 0 || escolhaSub > 3){
+                    while (escolhaSub <= 0 || escolhaSub > 3){
                         System.out.println("\nOpção inválida. Tente novamente.\n");
 
                         exibirSubmenu(escolha);
@@ -174,12 +187,31 @@ public class App {
 
                     break;
                 case 4:
+                    exibirSubmenu(escolha);
+
+                    int escolhaSub4 = input.nextInt();
+                    input.nextLine();
+
+                    while (escolhaSub4 <= 0 || escolhaSub4 > 1){
+                        System.out.println("\nOpção inválida. Tente novamente.\n");
+
+                        exibirSubmenu(escolha);
+
+                        escolhaSub4 = input.nextInt();
+                        input.nextLine();
+                    }
+
+                    handleSubmenu3(escolhaSub4, input, formato);
+
                     break;
+                case 5:
+                    System.out.println("Saindo...");
+                    System.exit(0);
+                    break;
+                default:
+                    continuarOuSair(input);
             }
-
         }
-
-
     }
 
     public static void exibirMenu() {
@@ -188,8 +220,8 @@ public class App {
         System.out.println("\n1. Listar");
         System.out.println("2. Agendar Consulta");
         System.out.println("3. Editar Consulta");
-        System.out.println("4. Gerenciar pacientes e médicos");
-        System.out.println("6. Sair");
+        System.out.println("4. Gerenciar médicos");
+        System.out.println("5. Sair");
 
     }
 
@@ -209,7 +241,7 @@ public class App {
                 break;
             case 4:
                 System.out.println("1. Cadastrar novo médico");
-                System.out.println("2. Cadastrar novo paciente");
+                //System.out.println("2. Cadastrar novo paciente");
                 break;
         }
     }
@@ -218,20 +250,24 @@ public class App {
 
         switch (escolha){
             case 1:
+                System.out.println("\n* Listando pacientes... *\n");
                 listarPacientes();
                 continuarOuSair(input);
                 break;
 
             case 2:
-                Especialidade.listarMedicos();
+                System.out.println("\n* Listando médicos... *\n");
+                Especialidade.listarMedicos(Especialidade.getMedicos());
                 continuarOuSair(input);
                 break;
             case 3:
+                System.out.println("\n* Listando consultas... *\n");
                 listarConsultas(consultas, formato);
                 //listar medicos da especialidade???
                 continuarOuSair(input);
                 break;
             case 4:
+                System.out.println("\n* Listando especialidades... *\n");
                 listarEspecialidades(true);
                 continuarOuSair(input);
                 break;
@@ -239,6 +275,15 @@ public class App {
 
     }
 
+    public static void handleSubmenu3(int escolha, Scanner input, SimpleDateFormat formato){
+        switch (escolha){
+            case 1:
+                cadastrarMedico(input, formato);
+                break;
+            default:
+                continuarOuSair(input);
+        }
+    }
     public static Consulta getConsultaByEspecialidade(Scanner input, SimpleDateFormat formato, String op){
         System.out.println("De qual especialidade é a consulta?\n(insira o número correspondente à especialidade)");
         listarEspecialidades(false);
@@ -393,13 +438,163 @@ public class App {
         }
     }
 
+    public static void cadastrarMedico(Scanner input, SimpleDateFormat formato){
+
+        System.out.println("\n\t* Cadastro de Médico *\n");
+        System.out.println("\nInsira o nome do médico:");
+        String nome =  input.nextLine();
+
+        while (nome.length() < 3){
+            System.out.println("\nO nome deve ter ao menos 3 dígitos. Tente novamente.\n");
+
+            System.out.println("\nInsira o nome do médico:");
+            nome =  input.nextLine();
+        }
+
+        System.out.println("\nInsira o cpf do médico:\n(OBS.: O CPF deve ser único.)");
+        String cpf = input.nextLine();
+
+        while(cpf.length() < 11 || !isNumeric(cpf)){
+            System.out.println("\nFormato de cpf não permitido. Deve possuir 11 dígitos e ser numérico. Tente novamente.\n");
+            System.out.println("\nInsira o cpf do paciente:\n(OBS.: O CPF deve ser único.)");
+            cpf = input.nextLine();
+        }
+
+        String finalCpf = cpf;
+
+        Optional<Medico> medicoCPFRepetido = Especialidade.getMedicos().stream()
+                .filter(m -> m.getCpf().equals(finalCpf))
+                .findFirst();
+
+        if(medicoCPFRepetido.isPresent()){
+            System.out.println("\nO médico com o CPF " + cpf + "já está cadastrado no nome de " + medicoCPFRepetido.get().getNome());
+            System.out.println("\nSelecione uma das opções");
+            System.out.println("1. Cancelar cadastro");
+            System.out.println("2. Digitar o CPF novamente");
+            System.out.println("3. Utilizar o usuário " + medicoCPFRepetido.get().getNome() );
+            //System.out.println("1. Sim\n2.Não");
+            int cancelarCad = input.nextInt();
+            input.nextLine();
+
+            while(cancelarCad != 1 && cancelarCad != 2 && cancelarCad != 3){
+                System.out.println("\nOpção inválida. Tente novamente.\n");
+
+                System.out.println("\nSelecione uma das opções");
+                System.out.println("1. Cancelar cadastro");
+                System.out.println("2. Digitar o CPF novamente");
+                cancelarCad = input.nextInt();
+                input.nextLine();
+            }
+
+            if(cancelarCad == 1){
+                continuarOuSair(input);
+            }else if(cancelarCad == 2){
+                System.out.println("Insira o cpf do médico:");
+                cpf = input.nextLine();
+            }
+        }
+
+        Date dataNascimento = null;
+        boolean formatoValido = false;
+
+        while (!formatoValido) {
+            System.out.println("\nInsira a data de nascimento do médico (padrão dd/mm/yyyy):");
+            String data = input.nextLine();
+
+            try {
+                dataNascimento = formato.parse(data);
+                formatoValido = true;
+            } catch (ParseException e) {
+                System.out.println("\nFormato inválido. Por favor, insira a data no formato dd/mm/yyyy.");
+            }
+        }
+
+        System.out.println("\nSelecione qual será a especialidade do médico:\n");
+
+        listarEspecialidades(true);
+        int especialidadeIndex = input.nextInt() - 1;
+        input.nextLine();
+
+        while(especialidadeIndex < 0 || especialidadeIndex > especialidades.size() - 1){
+            System.out.println("\nEssa especialidade não existe. Tente novamente\n");
+
+            System.out.println("\nSelecione qual será a especialidade do médico:\n");
+
+            listarEspecialidades(true);
+            especialidadeIndex = input.nextInt() - 1;
+            input.nextLine();
+        }
+
+        Especialidade especialidade = especialidades.get(especialidadeIndex);
+
+        System.out.println("\nInsira o CRM do médico: \n");
+
+        String CRM = input.nextLine();
+        while (!isNumeric(CRM)){
+            System.out.println("\nO CRM deve ser numérico. Tente novamente.\n");
+            System.out.println("\nInsira o CRM do médico (Deve ser único): \n");
+            CRM = input.nextLine();
+        }
+
+        System.out.println("Qual será o salário base do médico?");
+
+        double salario = input.nextDouble();
+        input.nextLine();
+
+        while(salario < 1500){
+            System.out.println("Salário abaixo do indicado. Tente acima de R$1.500.");
+            salario = input.nextDouble();
+            input.nextLine();
+        }
+
+        //salario base e ganha a mais por consulta
+
+        Medico newMed = new Medico(nome, cpf, dataNascimento, salario, CRM, especialidade);
+        boolean status = Especialidade.addMedico(newMed);
+
+        if(status){
+            System.out.println("\nCRM já cadastrado\n");
+        }else{
+            System.out.println("\n Médico cadastrado com sucesso!\n");
+        }
+    }
+
+    public static void adicionarNovaEspecialidade(){
+
+    }
+
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
     public static Paciente cadastrarPaciente(Scanner input, SimpleDateFormat formato) throws ParseException {
         System.out.println("\n* Cadastro de Paciente *\n");
         System.out.println("\nInsira o nome do paciente:");
         String nome =  input.nextLine();
 
-        System.out.println("\nInsira o cpf do paciente:");
+        while (nome.length() < 3){
+            System.out.println("\nO nome deve ter ao menos 3 dígitos. Tente novamente.\n");
+
+            System.out.println("\nInsira o nome do paciente:");
+            nome =  input.nextLine();
+        }
+
+        System.out.println("\nInsira o cpf do paciente:\n(OBS.: O CPF deve ser único.)");
         String cpf = input.nextLine();
+
+        while(cpf.length() < 11 || !isNumeric(cpf)){
+            System.out.println("\nFormato de cpf não permitido. Deve possuir 11 dígitos e ser numérico. Tente novamente.\n");
+            System.out.println("\nInsira o cpf do paciente:\n(OBS.: O CPF deve ser único.)");
+            cpf = input.nextLine();
+        }
 
         String finalCpf = cpf;
         Optional<Paciente> pacienteCPFRepetido = pacientes.stream()
@@ -440,6 +635,13 @@ public class App {
 
         System.out.println("\nInsira o número do Cartão do SUS do paciente:");
         String cartaoSUS = input.nextLine();
+
+        while (!isNumeric(cartaoSUS)){
+            System.out.println("\nDeve ser numérico. Tente novamente.\n");
+
+            System.out.println("\nInsira o número do Cartão do SUS do paciente:");
+            cartaoSUS = input.nextLine();
+        }
 
         String finalCartaoSUS = cartaoSUS;
         Optional<Paciente> pacienteCartaoSUSRepetido = pacientes.stream()
@@ -516,6 +718,11 @@ public class App {
 
     }
     public static void listarConsultas(ArrayList<Consulta> consultas, SimpleDateFormat formato){
+
+        if(consultas.isEmpty()){
+            System.out.println("\nAinda não há consultas cadastradas.\n");
+            return;
+        }
         for (int i = 0; i < consultas.size(); i++) {
 
             Consulta consulta = consultas.get(i);
